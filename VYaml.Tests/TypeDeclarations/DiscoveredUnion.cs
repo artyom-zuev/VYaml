@@ -9,7 +9,7 @@ namespace VYaml.Tests.TypeDeclarations
         int A { get; set; }
     }
 
-    [YamlObject]
+    [YamlObject(SerializeProperties = true)]
     public partial class DiscoveredImpl1 : IDiscoveredUnion
     {
         public int A { get; set; }
@@ -17,20 +17,20 @@ namespace VYaml.Tests.TypeDeclarations
     }
 
     // Derives from another member, so it has to be matched before its base to keep its own tag
-    [YamlObject]
+    [YamlObject(SerializeProperties = true)]
     public partial class DiscoveredImpl1Derived : DiscoveredImpl1
     {
         public string? C { get; set; }
     }
 
-    [YamlObject]
+    [YamlObject(SerializeProperties = true)]
     public partial struct DiscoveredStruct : IDiscoveredUnion
     {
         public int A { get; set; }
     }
 
     // Shares its name with a member in another namespace
-    [YamlObject]
+    [YamlObject(SerializeProperties = true)]
     public partial class DiscoveredSameName : IDiscoveredUnion
     {
         public int A { get; set; }
@@ -42,7 +42,7 @@ namespace VYaml.Tests.TypeDeclarations
         public int A { get; set; }
     }
 
-    [YamlObject]
+    [YamlObject(SerializeProperties = true)]
     public partial class WithDiscoveredUnionMember
     {
         public IDiscoveredUnion[]? Items { get; set; }
@@ -51,7 +51,7 @@ namespace VYaml.Tests.TypeDeclarations
 
 namespace VYaml.Tests.TypeDeclarations.Other
 {
-    [YamlObject]
+    [YamlObject(SerializeProperties = true)]
     public partial class DiscoveredSameName : IDiscoveredUnion
     {
         public int A { get; set; }

@@ -3,7 +3,7 @@ using VYaml.Annotations;
 namespace VYaml.Tests.TypeDeclarations
 {
     // Read-only members next to serialized ones, for checking that they are skipped instead of failing the type
-    [YamlObject]
+    [YamlObject(SerializeProperties = true)]
     public partial class WithReadOnlyMembers
     {
         public int A = 1;
@@ -15,7 +15,7 @@ namespace VYaml.Tests.TypeDeclarations
     }
 
     // A get-only property set by the constructor is still serialized
-    [YamlObject]
+    [YamlObject(SerializeProperties = true)]
     public partial class WithConstructedGetOnly
     {
         public int A { get; }

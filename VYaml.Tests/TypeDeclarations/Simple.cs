@@ -4,43 +4,43 @@ using VYaml.Annotations;
 
 namespace VYaml.Tests.TypeDeclarations
 {
-    [YamlObject]
+    [YamlObject(SerializeProperties = true)]
     public partial class SimpleTypeZero
     {
     }
 
-    [YamlObject]
+    [YamlObject(SerializeProperties = true)]
     public partial class SimpleTypeOne
     {
         public int One { get; set; }
     }
 
-    [YamlObject]
+    [YamlObject(SerializeProperties = true)]
     public partial class SimpleTypeTwo
     {
         public int One { get; set; }
         public int Two { get; set; }
     }
 
-    [YamlObject]
+    [YamlObject(SerializeProperties = true)]
     public partial struct SimpleUnmanagedStruct
     {
         public int MyProperty { get; set; }
     }
 
-    [YamlObject]
+    [YamlObject(SerializeProperties = true)]
     public partial struct SimpleStruct
     {
         public string MyProperty { get; set; }
     }
 
-    [YamlObject]
+    [YamlObject(SerializeProperties = true)]
     public partial class WithArray
     {
         public SimpleTypeOne[]? One { get; set; }
     }
 
-    [YamlObject]
+    [YamlObject(SerializeProperties = true)]
     public partial class WithTuple
     {
         public Tuple<int> One { get; set; } = default!;
@@ -52,7 +52,7 @@ namespace VYaml.Tests.TypeDeclarations
         public Tuple<int, int, int, int, int, int, int> Seven { get; set; } = default!;
     }
 
-    [YamlObject]
+    [YamlObject(SerializeProperties = true)]
     public partial class WithValueTuple
     {
         public ValueTuple<int> One { get; set; }
@@ -64,7 +64,7 @@ namespace VYaml.Tests.TypeDeclarations
         public ValueTuple<int, int, int, int, int, int, int> Seven { get; set; }
     }
 
-    [YamlObject]
+    [YamlObject(SerializeProperties = true)]
     public partial class WithDefaultValue
     {
         public readonly int Value;
@@ -155,21 +155,21 @@ namespace VYaml.Tests.TypeDeclarations
         public int A { get; }
     }
 
-    [YamlObject]
+    [YamlObject(SerializeProperties = true)]
     public partial class InterfaceImpl1 : IUnion
     {
         public int A { get; set; }
         public string B { get; set; } = default!;
     }
 
-    [YamlObject]
+    [YamlObject(SerializeProperties = true)]
     public partial class InterfaceImpl2 : IUnion
     {
         public int A { get; set; }
         public string C { get; set; } = default!;
     }
 
-    [YamlObject]
+    [YamlObject(SerializeProperties = true)]
     [YamlObjectUnion("!impl1", typeof(AbstractImpl1))]
     [YamlObjectUnion("!impl2", typeof(AbstractImpl2))]
     public abstract partial class AbstractUnion
@@ -177,7 +177,7 @@ namespace VYaml.Tests.TypeDeclarations
         public abstract int A { get; protected set; }
     }
 
-    [YamlObject]
+    [YamlObject(SerializeProperties = true)]
     public partial class AbstractImpl1 : AbstractUnion
     {
         public override int A { get; protected set; }
@@ -190,7 +190,7 @@ namespace VYaml.Tests.TypeDeclarations
         }
     }
 
-    [YamlObject]
+    [YamlObject(SerializeProperties = true)]
     public partial class AbstractImpl2 : AbstractUnion
     {
         public override int A { get; protected set; }
@@ -203,21 +203,21 @@ namespace VYaml.Tests.TypeDeclarations
         }
     }
 
-    [YamlObject]
+    [YamlObject(SerializeProperties = true)]
     public partial class WithUnionMember
     {
         public int A { get; set; }
         public IUnion Union { get; set; } = default!;
     }
 
-    [YamlObject]
+    [YamlObject(SerializeProperties = true)]
     public partial class WithArrayUnionMember
     {
         public int A { get; set; }
         public IUnion[] Unions { get; set; } = default!;
     }
 
-    [YamlObject]
+    [YamlObject(SerializeProperties = true)]
     public partial class WithIgnoreMember
     {
         public int A { get; set; }
@@ -228,7 +228,7 @@ namespace VYaml.Tests.TypeDeclarations
         public int C { get; set; }
     }
 
-    [YamlObject]
+    [YamlObject(SerializeProperties = true)]
     public partial class WithRenamedMember
     {
         public int A { get; set; }
@@ -239,7 +239,7 @@ namespace VYaml.Tests.TypeDeclarations
         public int C { get; set; }
     }
 
-    [YamlObject]
+    [YamlObject(SerializeProperties = true)]
     public partial class WithCustomConstructor
     {
         public int Foo { get; }
@@ -252,7 +252,7 @@ namespace VYaml.Tests.TypeDeclarations
         }
     }
 
-    [YamlObject]
+    [YamlObject(SerializeProperties = true)]
     public partial class WithCustomConstructor2
     {
         public int Foo { get; }
@@ -272,7 +272,7 @@ namespace VYaml.Tests.TypeDeclarations
         }
     }
 
-    [YamlObject]
+    [YamlObject(SerializeProperties = true)]
     public partial record WithCustomConstructor3
     {
         public int X { get; }
@@ -288,7 +288,7 @@ namespace VYaml.Tests.TypeDeclarations
         }
     }
 
-    [YamlObject]
+    [YamlObject(SerializeProperties = true)]
     public partial class WithCustomConstructorAndOtherProps
     {
         public int Foo { get; }
@@ -303,13 +303,13 @@ namespace VYaml.Tests.TypeDeclarations
         }
     }
 
-    [YamlObject(NamingConvention.SnakeCase)]
+    [YamlObject(NamingConvention.SnakeCase, SerializeProperties = true)]
     public partial class WithCustomNamingConvention
     {
         public int HogeFuga { get; set; }
     }
 
-    [YamlObject]
+    [YamlObject(SerializeProperties = true)]
     public partial class WithUnsignedDefaultValues
     {
         public uint UintValue { get; }
@@ -331,13 +331,13 @@ namespace VYaml.Tests.TypeDeclarations
         }
     }
 
-    [YamlObject]
+    [YamlObject(SerializeProperties = true)]
     public partial class GenericType<T>
     {
         public T? Value { get; set; }
     }
 
-    [YamlObject]
+    [YamlObject(SerializeProperties = true)]
     public partial class GenericType<T, T2>
     {
         public T? Foo { get; set; }
@@ -345,7 +345,7 @@ namespace VYaml.Tests.TypeDeclarations
         public T2? Bar { get; set; }
     }
 
-    [YamlObject]
+    [YamlObject(SerializeProperties = true)]
     public partial class WithNumericDefaultValues
     {
         public ushort Address { get; }
@@ -369,7 +369,7 @@ namespace VYaml.Tests.TypeDeclarations
             Name = name;
         }
     }
-    [YamlObject]
+    [YamlObject(SerializeProperties = true)]
     public partial class WithPrivateMembers
     {
         public int PublicField;
@@ -394,7 +394,7 @@ namespace VYaml.Tests.TypeDeclarations
         public int GetPrivateField() => _privateField;
     }
 
-    [YamlObject]
+    [YamlObject(SerializeProperties = true)]
     public partial class WithPrivateMembersSettable
     {
         public int PublicValue { get; set; }
@@ -409,7 +409,7 @@ namespace VYaml.Tests.TypeDeclarations
         public int GetSecret() => _secret;
     }
 
-    [YamlObject]
+    [YamlObject(SerializeProperties = true)]
     public partial class TypeWithNullableProperties
     {
         public string? NullableString { get; set; }
@@ -426,7 +426,7 @@ namespace VYaml.Tests.TypeDeclarations
 // another namespace, same type name
 namespace VYaml.Tests.TypeDeclarations.More
 {
-    [YamlObject]
+    [YamlObject(SerializeProperties = true)]
     public partial class StandardTypeTwo
     {
         public string? One { get; set; }
@@ -439,7 +439,7 @@ namespace VYaml.Tests.TypeDeclarations.More
     }
 }
 
-[YamlObject]
+[YamlObject(SerializeProperties = true)]
 public partial class GlobalNamespaceType
 {
     public int MyProperty { get; set; }

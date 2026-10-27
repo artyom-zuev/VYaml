@@ -19,6 +19,11 @@ namespace VYaml.Annotations
     {
         public NamingConvention NamingConvention { get; }
 
+        // Whether public properties are serialized like public fields. Off by default: a type serializes its fields, plus
+        // only the properties marked [YamlMember]. Set it on types built around properties, such as ones whose
+        // constructor parameters name get-only properties.
+        public bool SerializeProperties { get; set; }
+
         public YamlObjectAttribute(NamingConvention namingConvention = NamingConvention.LowerCamelCase)
         {
             NamingConvention = namingConvention;

@@ -32,6 +32,13 @@ static class TypeMetaAnalyzer
             }
         }
 
+        // Makes types serialize fields only unless [YamlObject(SerializeProperties = true)] says otherwise
+        // Public properties used to be serialized like public fields, so a data type built on fields wrote out every
+        // helper or wrapper property next to them, sometimes storing the same value twice under two keys. Properties
+        // marked [YamlMember] are still serialized either way.
+        var serializeProperties = yamlObjectAttribute.NamedArguments
+            .Any(x => x is { Key: "SerializeProperties", Value.Value: true });
+
         var unions = symbol.GetAttributes()
             .Where(x => SymbolEqualityComparer.Default.Equals(x.AttributeClass, references.YamlObjectUnionAttribute))
             .Where(x => x.ConstructorArguments.Length == 2)
@@ -55,7 +62,7 @@ static class TypeMetaAnalyzer
         var diagnostics = new List<DiagnosticInfo>();
         var valid = Validate(symbol, syntax, typeName, unions, isUnion, diagnostics);
 
-        var allMembers = SelectMembers(symbol, references, namingConvention);
+        var allMembers = SelectMembers(symbol, references, namingConvention, serializeProperties);
 
         var constructorParameterNames = EquatableArray<string>.Empty;
         var setterMemberNames = EquatableArray<string>.Empty;
@@ -338,7 +345,7 @@ static class TypeMetaAnalyzer
         return !error;
     }
 
-    static MemberAnalysis[] SelectMembers(INamedTypeSymbol symbol, ReferenceSymbols references, NamingConvention namingConvention)
+    static MemberAnalysis[] SelectMembers(INamedTypeSymbol symbol, ReferenceSymbols references, NamingConvention namingConvention, bool serializeProperties)
     {
         return symbol.GetAllMembers() // iterate includes parent type
             .Where(x => x is (IFieldSymbol or IPropertySymbol) and { IsStatic: false, IsImplicitlyDeclared: false })
@@ -355,6 +362,11 @@ static class TypeMetaAnalyzer
 
                 if (x is IPropertySymbol p)
                 {
+                    if (!serializeProperties && !x.ContainsAttribute(references.YamlMemberAttribute))
+                    {
+                        return false;
+                    }
+
                     // set only can't be serializable member
                     if (p.GetMethod == null && p.SetMethod != null)
                     {

@@ -3,7 +3,7 @@ using VYaml.Annotations;
 
 namespace VYaml.PerformanceTest
 {
-    [YamlObject]
+    [YamlObject(SerializeProperties = true)]
     public partial class TypedConfig
     {
         [YamlMember("@type")]
@@ -20,7 +20,7 @@ namespace VYaml.PerformanceTest
         public RouteConfig RouteConfig { get; set; }
     }
 
-    [YamlObject]
+    [YamlObject(SerializeProperties = true)]
     public partial class RouteConfig
     {
         public string Name { get; set; }
@@ -29,14 +29,14 @@ namespace VYaml.PerformanceTest
         public List<VirtualHost> VirtualHosts { get; set; }
     }
 
-    [YamlObject]
+    [YamlObject(SerializeProperties = true)]
     public partial class Routes
     {
         public Dictionary<string, string> Match { get; set; }
         public Dictionary<string, string> Route { get; set; }
     }
 
-    [YamlObject]
+    [YamlObject(SerializeProperties = true)]
     public partial class VirtualHost
     {
         public string Name { get; set; }
@@ -44,7 +44,7 @@ namespace VYaml.PerformanceTest
         public List<Routes> Routes { get; set; }
     }
 
-    [YamlObject]
+    [YamlObject(SerializeProperties = true)]
     public partial class SocketAddress
     {
         public string Address { get; set; }
@@ -53,20 +53,20 @@ namespace VYaml.PerformanceTest
         public string PortValue { get; set; }
     }
 
-    [YamlObject]
+    [YamlObject(SerializeProperties = true)]
     public partial class Address
     {
         [YamlMember("socket_address")]
         public SocketAddress SocketAddress { get; set; }
     }
 
-    [YamlObject]
+    [YamlObject(SerializeProperties = true)]
     public partial class Admin
     {
         public Address Address { get; set; }
     }
 
-    [YamlObject]
+    [YamlObject(SerializeProperties = true)]
     public partial class Listener
     {
         public string Name { get; set; }
@@ -76,13 +76,13 @@ namespace VYaml.PerformanceTest
         public List<FilterChain> FilterChains { get; set; }
     }
 
-    [YamlObject]
+    [YamlObject(SerializeProperties = true)]
     public partial class FilterChain
     {
         public List<Filter> Filters { get; set; }
     }
 
-    [YamlObject]
+    [YamlObject(SerializeProperties = true)]
     public partial class Filter
     {
         public string Name { get; set; }
@@ -94,7 +94,7 @@ namespace VYaml.PerformanceTest
         public List<HttpFilter> HttpFilters { get; set; }
     }
 
-    [YamlObject]
+    [YamlObject(SerializeProperties = true)]
     public partial class HttpFilter
     {
         public string Name { get; set; }
@@ -103,13 +103,13 @@ namespace VYaml.PerformanceTest
         public TypedConfig TypedConfig { get; set; }
     }
 
-    [YamlObject]
+    [YamlObject(SerializeProperties = true)]
     public partial class StaticResources
     {
         public List<Listener> Listeners { get; set; }
     }
 
-    [YamlObject]
+    [YamlObject(SerializeProperties = true)]
     public partial class SampleEnvoy
     {
         public Admin Admin { get; set; }

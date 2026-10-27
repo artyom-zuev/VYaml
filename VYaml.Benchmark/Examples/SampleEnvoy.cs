@@ -4,7 +4,7 @@ using VYaml.Annotations;
 
 namespace VYaml.Benchmark.Examples;
 
-[YamlObject]
+[YamlObject(SerializeProperties = true)]
 public partial class TypedConfig
 {
     [YamlMember("@type")]
@@ -29,7 +29,7 @@ public partial class TypedConfig
     public RouteConfig RouteConfig { get; init; } = default!;
 }
 
-[YamlObject]
+[YamlObject(SerializeProperties = true)]
 public partial class RouteConfig
 {
     public string Name { get; init; } = default!;
@@ -40,14 +40,14 @@ public partial class RouteConfig
     public List<VirtualHost> VirtualHosts { get; init; } = default!;
 }
 
-[YamlObject]
+[YamlObject(SerializeProperties = true)]
 public partial class Routes
 {
     public Dictionary<string, string> Match { get; init; } = default!;
     public Dictionary<string, string> Route { get; init; } = default!;
 }
 
-[YamlObject]
+[YamlObject(SerializeProperties = true)]
 public partial class VirtualHost
 {
     public string Name { get; init; } = default!;
@@ -55,7 +55,7 @@ public partial class VirtualHost
     public List<Routes> Routes { get; init; } = default!;
 }
 
-[YamlObject]
+[YamlObject(SerializeProperties = true)]
 public partial class SocketAddress
 {
     public string Address { get; init; } = default!;
@@ -66,7 +66,7 @@ public partial class SocketAddress
     public int PortValue { get; init; }
 }
 
-[YamlObject]
+[YamlObject(SerializeProperties = true)]
 public partial class Address
 {
     [YamlMember("socket_address")]
@@ -75,13 +75,13 @@ public partial class Address
     public SocketAddress SocketAddress { get; init; } = default!;
 }
 
-[YamlObject]
+[YamlObject(SerializeProperties = true)]
 public partial class Admin
 {
     public Address Address { get; init; } = default!;
 }
 
-[YamlObject]
+[YamlObject(SerializeProperties = true)]
 public partial class Listener
 {
     public string Name { get; init; } = default!;
@@ -93,13 +93,13 @@ public partial class Listener
     public List<FilterChain> FilterChains { get; init; } = default!;
 }
 
-[YamlObject]
+[YamlObject(SerializeProperties = true)]
 public partial class FilterChain
 {
     public List<Filter> Filters { get; init; } = default!;
 }
 
-[YamlObject]
+[YamlObject(SerializeProperties = true)]
 public partial class Filter
 {
     public string Name { get; init; } = default!;
@@ -115,7 +115,7 @@ public partial class Filter
     public List<HttpFilter> HttpFilters { get; init; } = default!;
 }
 
-[YamlObject]
+[YamlObject(SerializeProperties = true)]
 public partial class HttpFilter
 {
     public string Name { get; init; } = default!;
@@ -126,13 +126,13 @@ public partial class HttpFilter
     public TypedConfig TypedConfig { get; init; } = default!;
 }
 
-[YamlObject]
+[YamlObject(SerializeProperties = true)]
 public partial class StaticResources
 {
     public List<Listener> Listeners { get; init; } = default!;
 }
 
-[YamlObject]
+[YamlObject(SerializeProperties = true)]
 public partial class SampleEnvoy
 {
     public Admin Admin { get; init; } = default!;

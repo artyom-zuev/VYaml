@@ -121,7 +121,7 @@ namespace VYaml.Tests.NativeAot
         B,
     }
 
-    [YamlObject]
+    [YamlObject(SerializeProperties = true)]
     public partial class Config
     {
         public string? Name { get; set; }
@@ -136,13 +136,13 @@ namespace VYaml.Tests.NativeAot
         public Mode? OptionalMode { get; set; }
     }
 
-    [YamlObject]
+    [YamlObject(SerializeProperties = true)]
     public partial class Child
     {
         public int Value { get; set; }
     }
 
-    [YamlObject]
+    [YamlObject(SerializeProperties = true)]
     public partial class GenericWrapper<T>
     {
         public T? Value { get; set; }
@@ -155,32 +155,32 @@ namespace VYaml.Tests.NativeAot
     {
     }
 
-    [YamlObject]
+    [YamlObject(SerializeProperties = true)]
     public partial class Cat : IAnimal
     {
         public int Meows { get; set; }
     }
 
-    [YamlObject]
+    [YamlObject(SerializeProperties = true)]
     public partial class Dog : IAnimal
     {
         public int Barks { get; set; }
     }
 
-    [YamlObject]
+    [YamlObject(SerializeProperties = true)]
     [YamlObjectUnion("!a", typeof(DerivedA))]
     [YamlObjectUnion("!b", typeof(DerivedB))]
     public abstract partial class AbstractBase
     {
     }
 
-    [YamlObject]
+    [YamlObject(SerializeProperties = true)]
     public partial class DerivedA : AbstractBase
     {
         public int A { get; set; }
     }
 
-    [YamlObject]
+    [YamlObject(SerializeProperties = true)]
     public partial class DerivedB : AbstractBase
     {
         public int B { get; set; }

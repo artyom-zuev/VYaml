@@ -30,7 +30,7 @@ namespace VYaml.Tests.TypeDeclarations
         FugaFuga
     }
 
-    [YamlObject(NamingConvention.LowerCamelCase)]
+    [YamlObject(NamingConvention.LowerCamelCase, SerializeProperties = true)]
     public partial class AsLowerCamel
     {
         public int Foo { get; set; }
@@ -38,7 +38,7 @@ namespace VYaml.Tests.TypeDeclarations
         public LowerCamelEnum Buz { get; set; }
     }
 
-    [YamlObject(NamingConvention.UpperCamelCase)]
+    [YamlObject(NamingConvention.UpperCamelCase, SerializeProperties = true)]
     public partial class AsUpperCamel
     {
         public int Foo { get; set; }
@@ -46,7 +46,7 @@ namespace VYaml.Tests.TypeDeclarations
         public UpperCamelEnum Buz { get; set; }
     }
 
-    [YamlObject(NamingConvention.SnakeCase)]
+    [YamlObject(NamingConvention.SnakeCase, SerializeProperties = true)]
     public partial class AsSnakeCase
     {
         public int Foo { get; set; }
@@ -54,7 +54,7 @@ namespace VYaml.Tests.TypeDeclarations
         public SnakeCaseEnum Buz { get; set; }
     }
 
-    [YamlObject(NamingConvention.KebabCase)]
+    [YamlObject(NamingConvention.KebabCase, SerializeProperties = true)]
     public partial class AsKebabCase
     {
         public int Foo { get; set; }
