@@ -62,6 +62,15 @@ namespace VYaml.Tests.Serialization
         }
 
         [Test]
+        public void Serialize_NonMemberThrows()
+        {
+            Assert.Throws<YamlSerializerException>(() =>
+                Serialize<IDiscoveredUnion>(new DiscoveredNotYamlObject { A = 1 }));
+            Assert.Throws<YamlSerializerException>(() =>
+                Serialize(new WithDiscoveredUnionMember { Items = new IDiscoveredUnion[] { new DiscoveredImpl1(), new DiscoveredNotYamlObject() } }));
+        }
+
+        [Test]
         public void Deserialize_NonMemberTagThrows()
         {
             Assert.Throws<YamlSerializerException>(() =>

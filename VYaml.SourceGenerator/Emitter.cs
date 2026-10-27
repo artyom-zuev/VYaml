@@ -209,6 +209,13 @@ static class Emitter
                 codeWriter.AppendLine($"    context.Serialize(ref emitter, x);");
                 codeWriter.AppendLine( "    break;");
             }
+
+            // Throws for an implementation outside the union instead of writing nothing
+            // The switch had no default, so a value of any other type was skipped without a trace: a list holding one came
+            // out an item shorter, and a member holding one lost its key's value. That is typically an implementation left
+            // without [YamlObject], which only surfaced once the missing data was noticed after loading.
+            codeWriter.AppendLine("default:");
+            codeWriter.AppendLine($"    throw new YamlSerializerException($\"{{value.GetType()}} is not a member of the union {model.TypeName}. Mark it [YamlObject] or list it with [YamlObjectUnion].\");");
         }
     }
 
