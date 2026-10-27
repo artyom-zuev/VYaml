@@ -9,6 +9,7 @@ public enum NamingConvention
     UpperCamelCase,
     SnakeCase,
     KebabCase,
+    PreserveCase,
 }
 
 // Value-equatable projection of one [YamlObject] type, produced by TypeMetaAnalyzer and consumed by
@@ -96,6 +97,7 @@ sealed record MemberMetaModel
 {
     public string Name { get; }
     public string KeyName { get; }
+    public string SourceKeyName { get; }
     public string FullTypeName { get; }
     public bool HasKeyNameAlias { get; }
     public NamingConvention NamingConventionByType { get; }
@@ -108,10 +110,12 @@ sealed record MemberMetaModel
     // Computed (no backing field), so it is derived on demand and excluded from record equality,
     // which is correct because it is a pure function of KeyName.
     public byte[] KeyNameUtf8Bytes => System.Text.Encoding.UTF8.GetBytes(KeyName);
+    public byte[] SourceKeyNameUtf8Bytes => System.Text.Encoding.UTF8.GetBytes(SourceKeyName);
 
     public MemberMetaModel(
         string name,
         string keyName,
+        string sourceKeyName,
         string fullTypeName,
         bool hasKeyNameAlias,
         NamingConvention namingConventionByType,
@@ -123,6 +127,7 @@ sealed record MemberMetaModel
     {
         Name = name;
         KeyName = keyName;
+        SourceKeyName = sourceKeyName;
         FullTypeName = fullTypeName;
         HasKeyNameAlias = hasKeyNameAlias;
         NamingConventionByType = namingConventionByType;

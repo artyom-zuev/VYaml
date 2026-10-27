@@ -480,6 +480,7 @@ static class TypeMetaAnalyzer
         public int Order { get; }
         public bool HasKeyNameAlias { get; }
         public string KeyName { get; }
+        public string SourceKeyName { get; }
         public NamingConvention NamingConventionByType { get; }
 
         public bool IsConstructorParameter { get; set; }
@@ -498,6 +499,7 @@ static class TypeMetaAnalyzer
                 ? Name.Substring(1)
                 : Name;
             KeyName = NamingConventionMutator.Mutate(nameForKey, namingConventionByType);
+            SourceKeyName = nameForKey;
 
             var memberAttribute = symbol.GetAttribute(references.YamlMemberAttribute);
             if (memberAttribute != null)
@@ -507,6 +509,7 @@ static class TypeMetaAnalyzer
                 {
                     HasKeyNameAlias = true;
                     KeyName = aliasValue;
+                    SourceKeyName = aliasValue;
                 }
 
                 var orderProp = memberAttribute.NamedArguments.FirstOrDefault(x => x.Key == "Order");
@@ -551,6 +554,7 @@ static class TypeMetaAnalyzer
             return new MemberMetaModel(
                 name: Name,
                 keyName: KeyName,
+                sourceKeyName: SourceKeyName,
                 fullTypeName: FullTypeName,
                 hasKeyNameAlias: HasKeyNameAlias,
                 namingConventionByType: NamingConventionByType,

@@ -84,6 +84,9 @@ namespace VYaml.Serialization
         static readonly Dictionary<T, (string Value, bool Alias, byte[]? Utf8Plain)> StringValues = new();
         static readonly Dictionary<string, T> Values = new();
 
+        // Names as declared, for PreserveCase: StringValues holds them already converted to the default convention
+        static readonly Dictionary<T, string> DeclaredNames = new();
+
         // Defined members carrying at least one bit, sorted by bit value descending.
         // Used to decompose a composite [Flags] value into its named members.
         static readonly (ulong Bits, T Value)[] FlagsDescending;
@@ -109,6 +112,7 @@ namespace VYaml.Serialization
                     var mutator = NamingConventionMutator.Of(NamingConventionByType ?? YamlSerializerOptions.DefaultNamingConvention);
                     var name = Enum.GetName(type, value)!;
                     var stringValue = NamingConventionMutator.MutateToString(mutator, name.AsSpan());
+                    DeclaredNames[(T)value] = name;
                     StringValues.Add((T)value, (stringValue, false, TryEncodePlainUtf8(stringValue)));
                     Values.Add(stringValue, (T)value);
                 }
@@ -163,7 +167,14 @@ namespace VYaml.Serialization
                 return;
             }
 
-            var mutator = NamingConventionMutator.Of(NamingConventionByType ?? context.Options.NamingConvention);
+            var convention = NamingConventionByType ?? context.Options.NamingConvention;
+            if (convention == NamingConvention.PreserveCase)
+            {
+                emitter.WriteString(DeclaredNames[value]);
+                return;
+            }
+
+            var mutator = NamingConventionMutator.Of(convention);
             emitter.WriteString(NamingConventionMutator.MutateToString(mutator, stringValue.AsSpan()));
         }
 
@@ -278,7 +289,13 @@ namespace VYaml.Serialization
                 return stringValue;
             }
 
-            var mutator = NamingConventionMutator.Of(NamingConventionByType ?? context.Options.NamingConvention);
+            var convention = NamingConventionByType ?? context.Options.NamingConvention;
+            if (convention == NamingConvention.PreserveCase)
+            {
+                return DeclaredNames[value];
+            }
+
+            var mutator = NamingConventionMutator.Of(convention);
             return NamingConventionMutator.MutateToString(mutator, stringValue.AsSpan());
         }
 

@@ -2,12 +2,15 @@ using System;
 
 namespace VYaml.Annotations
 {
+    // With PreserveCase, keys and enum values stay exactly as declared
+    // Every other convention rewrites names to the specified case
     public enum NamingConvention
     {
         LowerCamelCase,
         UpperCamelCase,
         SnakeCase,
         KebabCase,
+        PreserveCase,
     }
 
     [AttributeUsage(AttributeTargets.Class |

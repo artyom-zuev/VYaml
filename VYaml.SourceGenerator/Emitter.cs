@@ -88,6 +88,12 @@ static class Emitter
             codeWriter.Append($"static readonly byte[] {member.Name}KeyUtf8Bytes = ");
             codeWriter.AppendByteArrayString(member.KeyNameUtf8Bytes);
             codeWriter.AppendLine($"; // {member.KeyName}", false);
+            if (member.SourceKeyName != member.KeyName)
+            {
+                codeWriter.Append($"static readonly byte[] {member.Name}SourceKeyUtf8Bytes = ");
+                codeWriter.AppendByteArrayString(member.SourceKeyNameUtf8Bytes);
+                codeWriter.AppendLine($"; // {member.SourceKeyName}", false);
+            }
             codeWriter.AppendLine();
         }
 
@@ -126,6 +132,16 @@ static class Emitter
                 using (codeWriter.BeginBlockScope($"if (context.Options.NamingConvention == global::VYaml.Annotations.NamingConvention.{member.NamingConventionByType})"))
                 {
                     codeWriter.AppendLine($"emitter.WriteScalar({member.Name}KeyUtf8Bytes);");
+                }
+
+                // Writes keys as declared when the options ask for PreserveCase
+                // The key bytes above are already converted to the type's convention, and converting them again can't
+                // restore the declared casing (HP is baked in as hP), so the declared name is kept next to them.
+                // Reading needs no counterpart: incoming keys are converted to the type's convention before matching.
+                using (codeWriter.BeginBlockScope("else if (context.Options.NamingConvention == global::VYaml.Annotations.NamingConvention.PreserveCase)"))
+                {
+                    var sourceKeyBytes = member.SourceKeyName != member.KeyName ? $"{member.Name}SourceKeyUtf8Bytes" : $"{member.Name}KeyUtf8Bytes";
+                    codeWriter.AppendLine($"emitter.WriteScalar({sourceKeyBytes});");
                 }
                 using (codeWriter.BeginBlockScope("else"))
                 {
@@ -253,7 +269,21 @@ static class Emitter
             }
             codeWriter.AppendLine();
 
-            using (codeWriter.BeginBlockScope($"if (context.Options.NamingConvention != global::VYaml.Annotations.NamingConvention.{model.NamingConventionByType})"))
+            // Matches [YamlMember("name")] aliases as written before converting the key
+            // Aliases are written verbatim under every convention, but an incoming key was converted to the type's
+            // convention whenever the options named a different one, so an alias like Alias_Key became alias_Key and
+            // no longer matched. Under PreserveCase options every aliased member failed to read this way.
+            var aliasChecks = model.Members
+                .Where(x => x.HasKeyNameAlias)
+                .Select(x => $"key.SequenceEqual({x.Name}KeyUtf8Bytes)")
+                .ToArray();
+            var convertCondition = $"context.Options.NamingConvention != global::VYaml.Annotations.NamingConvention.{model.NamingConventionByType}";
+            if (aliasChecks.Length > 0)
+            {
+                convertCondition += $" && !({string.Join(" || ", aliasChecks)})";
+            }
+
+            using (codeWriter.BeginBlockScope($"if ({convertCondition})"))
             {
                 codeWriter.AppendLine($"global::VYaml.Serialization.NamingConventionMutator.MutateToThreadStaticBufferUtf8(key, global::VYaml.Annotations.NamingConvention.{model.NamingConventionByType}, out var mutated, out var written);");
                 codeWriter.AppendLine("key = mutated.AsSpan(0, written);");

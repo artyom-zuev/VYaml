@@ -14,6 +14,7 @@ namespace VYaml.Internal
                 NamingConvention.UpperCamelCase => s,
                 NamingConvention.SnakeCase => ToSnakeCase(s),
                 NamingConvention.KebabCase => ToSnakeCase(s, '-'),
+                NamingConvention.PreserveCase => s,
                 _ => throw new ArgumentOutOfRangeException(nameof(namingConvention), namingConvention, null)
             };
         }

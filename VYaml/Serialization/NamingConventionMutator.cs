@@ -16,6 +16,7 @@ namespace VYaml.Serialization
         public static readonly INamingConventionMutator LowerCamelCase = new LowerCamelCaseMutator();
         public static readonly INamingConventionMutator SnakeCase = new NotationCaseMutator('_');
         public static readonly INamingConventionMutator KebabCase = new NotationCaseMutator('-');
+        public static readonly INamingConventionMutator PreserveCase = new PreserveCaseMutator();
 
         [ThreadStatic]
         static char[]? ThreadStaticBuffer;
@@ -116,6 +117,7 @@ namespace VYaml.Serialization
             NamingConvention.UpperCamelCase => UpperCamelCase,
             NamingConvention.SnakeCase => SnakeCase,
             NamingConvention.KebabCase => KebabCase,
+            NamingConvention.PreserveCase => PreserveCase,
             _ => throw new ArgumentOutOfRangeException(nameof(namingConvention), namingConvention, null)
         };
 
@@ -140,6 +142,35 @@ namespace VYaml.Serialization
             }
 
             return ch;
+        }
+    }
+
+    class PreserveCaseMutator : INamingConventionMutator
+    {
+        public bool TryMutate(ReadOnlySpan<byte> source, Span<byte> destination, out int written)
+        {
+            if (source.Length > destination.Length)
+            {
+                written = default;
+                return false;
+            }
+
+            source.CopyTo(destination);
+            written = source.Length;
+            return true;
+        }
+
+        public bool TryMutate(ReadOnlySpan<char> source, Span<char> destination, out int written)
+        {
+            if (source.Length > destination.Length)
+            {
+                written = default;
+                return false;
+            }
+
+            source.CopyTo(destination);
+            written = source.Length;
+            return true;
         }
     }
 
