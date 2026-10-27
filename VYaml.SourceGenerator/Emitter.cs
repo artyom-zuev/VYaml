@@ -218,9 +218,24 @@ static class Emitter
 
         codeWriter.AppendLine("parser.ReadWithVerify(ParseEventType.MappingStart);");
         codeWriter.AppendLine();
-        foreach (var member in model.Members)
+
+        // A fix for initializers getting ignored (a field declared `= 1.5f` or `= new List<T>()` came back as 0 or null)
+        // Types built with a parameterless constructor are deserialized in place: the instance is created up front and
+        // only the keys present in the document are assigned to it. Building it at the end from locals (as types with
+        // constructor parameters still are) assigns every settable member, so a key missing from the document reset its
+        // member to default(T) and discarded the type's own initializer. In place, a missing key leaves the member as
+        // the constructor set it.
+        var inPlace = model.ConstructorParameterNames.Count == 0;
+        if (inPlace)
         {
-            codeWriter.AppendLine($"var __{member.Name}__ = {member.DefaultValueExpression};");
+            codeWriter.AppendLine($"var __result__ = new {model.TypeName}();");
+        }
+        else
+        {
+            foreach (var member in model.Members)
+            {
+                codeWriter.AppendLine($"var __{member.Name}__ = {member.DefaultValueExpression};");
+            }
         }
 
         using (codeWriter.BeginBlockScope("while (!parser.End && parser.CurrentEventType != ParseEventType.MappingEnd)"))
@@ -255,7 +270,20 @@ static class Emitter
                             using (codeWriter.BeginBlockScope($"{branching} (key.SequenceEqual({member.Name}KeyUtf8Bytes))"))
                             {
                                 codeWriter.AppendLine("parser.Read(); // skip key");
-                                codeWriter.AppendLine($"__{member.Name}__ = context.DeserializeWithAlias<{member.FullTypeName}>(ref parser);");
+                                if (!inPlace)
+                                {
+                                    codeWriter.AppendLine($"__{member.Name}__ = context.DeserializeWithAlias<{member.FullTypeName}>(ref parser);");
+                                }
+                                else if (model.SetterMemberNames.Contains(member.Name))
+                                {
+                                    codeWriter.AppendLine($"__result__.{member.Name} = context.DeserializeWithAlias<{member.FullTypeName}>(ref parser);");
+                                }
+                                else
+                                {
+                                    // Not reached for valid types (the analyzer requires every member to be settable when there are no
+                                    // constructor parameters), but the value is still read so the parser stays in step
+                                    codeWriter.AppendLine($"context.DeserializeWithAlias<{member.FullTypeName}>(ref parser);");
+                                }
                                 codeWriter.AppendLine("continue;");
                             }
                             branching = "else if";
@@ -273,6 +301,12 @@ static class Emitter
             }
         }
         codeWriter.AppendLine("parser.ReadWithVerify(ParseEventType.MappingEnd);");
+
+        if (inPlace)
+        {
+            codeWriter.AppendLine("return __result__;");
+            return;
+        }
 
         codeWriter.Append("return new ");
         if (model.HasConstructor)
