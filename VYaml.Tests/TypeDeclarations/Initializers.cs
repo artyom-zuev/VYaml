@@ -25,4 +25,12 @@ namespace VYaml.Tests.TypeDeclarations
         {
         }
     }
+
+    // An init-only setter can't be assigned after construction, so this type is built from the document at the end
+    [YamlObject(SerializeProperties = true)]
+    public partial class WithInitOnly
+    {
+        public int Count = 3;
+        public string Name { get; init; } = "default";
+    }
 }

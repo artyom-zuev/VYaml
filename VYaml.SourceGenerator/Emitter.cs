@@ -225,7 +225,9 @@ static class Emitter
         // constructor parameters still are) assigns every settable member, so a key missing from the document reset its
         // member to default(T) and discarded the type's own initializer. In place, a missing key leaves the member as
         // the constructor set it.
-        var inPlace = model.ConstructorParameterNames.Count == 0;
+        // Init-only setters can only be assigned in an object initializer, so types with one keep the build-at-the-end
+        // path too, and for them a missing key still resets its member to default(T).
+        var inPlace = model.ConstructorParameterNames.Count == 0 && !model.HasInitOnlySetters;
         if (inPlace)
         {
             codeWriter.AppendLine($"var __result__ = new {model.TypeName}();");

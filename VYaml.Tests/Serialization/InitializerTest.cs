@@ -46,6 +46,15 @@ namespace VYaml.Tests.Serialization
         }
 
         [Test]
+        public void Deserialize_InitOnly()
+        {
+            var result = Deserialize<WithInitOnly>("count: 5\nname: set\n");
+            Assert.That(result.Count, Is.EqualTo(5));
+            Assert.That(result.Name, Is.EqualTo("set"));
+            Assert.That(Serialize(result), Is.EqualTo("count: 5\nname: set\n"));
+        }
+
+        [Test]
         public void Deserialize_StructMissingKeysKeepInitializers()
         {
             var result = Deserialize<StructWithInitializers>("count: 5\n");

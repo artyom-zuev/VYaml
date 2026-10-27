@@ -33,6 +33,7 @@ sealed record TypeMetaModel
     public bool IsUnion { get; }
     public NamingConvention NamingConventionByType { get; }
     public bool HasConstructor { get; }
+    public bool HasInitOnlySetters { get; }
 
     public EquatableArray<MemberMetaModel> Members { get; }
     public EquatableArray<string> ConstructorParameterNames { get; }
@@ -60,6 +61,7 @@ sealed record TypeMetaModel
         bool isUnion,
         NamingConvention namingConventionByType,
         bool hasConstructor,
+        bool hasInitOnlySetters,
         EquatableArray<MemberMetaModel> members,
         EquatableArray<string> constructorParameterNames,
         EquatableArray<string> setterMemberNames,
@@ -81,6 +83,7 @@ sealed record TypeMetaModel
         IsUnion = isUnion;
         NamingConventionByType = namingConventionByType;
         HasConstructor = hasConstructor;
+        HasInitOnlySetters = hasInitOnlySetters;
         Members = members;
         ConstructorParameterNames = constructorParameterNames;
         SetterMemberNames = setterMemberNames;

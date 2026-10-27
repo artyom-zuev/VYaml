@@ -67,6 +67,7 @@ static class TypeMetaAnalyzer
         var constructorParameterNames = EquatableArray<string>.Empty;
         var setterMemberNames = EquatableArray<string>.Empty;
         var hasConstructor = false;
+        var hasInitOnlySetters = false;
 
         if (valid && !isUnion)
         {
@@ -115,6 +116,7 @@ static class TypeMetaAnalyzer
                 }
 
                 setterMemberNames = setterMembers.Select(x => x.Name).ToEquatableArray();
+                hasInitOnlySetters = setterMembers.Any(x => x.Symbol is IPropertySymbol { SetMethod.IsInitOnly: true });
             }
             else
             {
@@ -188,6 +190,7 @@ static class TypeMetaAnalyzer
             isUnion: isUnion,
             namingConventionByType: namingConvention,
             hasConstructor: hasConstructor,
+            hasInitOnlySetters: hasInitOnlySetters,
             members: members,
             constructorParameterNames: constructorParameterNames,
             setterMemberNames: setterMemberNames,
