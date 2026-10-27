@@ -73,6 +73,21 @@ static class TypeMetaAnalyzer
                     .Where(x => constructedMembers.All(c => !SymbolEqualityComparer.Default.Equals(x.Symbol, c.Symbol)))
                     .ToArray();
 
+                // Skips read-only members that no constructor parameter sets, instead of failing the type
+                // Computed properties (`public float Total => a + b;`), get-only properties and readonly fields can't be
+                // assigned when reading, so they used to be errors (YamlMemberPropertyMustHaveSetter and
+                // YamlMemberFieldCannotBeReadonly). Every helper property on a data type then needed its own [YamlIgnore].
+                // They are now left out of the document entirely, neither written nor read. A member explicitly marked
+                // [YamlMember] still reports the error, since it asks to be serialized and can't be.
+                var readOnlyMembers = setterMembers
+                    .Where(x => !x.IsSettable && !x.Symbol.ContainsAttribute(references.YamlMemberAttribute))
+                    .ToArray();
+                if (readOnlyMembers.Length > 0)
+                {
+                    allMembers = allMembers.Except(readOnlyMembers).ToArray();
+                    setterMembers = setterMembers.Except(readOnlyMembers).ToArray();
+                }
+
                 foreach (var setterMember in setterMembers)
                 {
                     switch (setterMember)
