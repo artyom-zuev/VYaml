@@ -39,6 +39,17 @@ static class TypeMetaAnalyzer
                 (string)x.ConstructorArguments[0].Value!,
                 (INamedTypeSymbol)x.ConstructorArguments[1].Value!))
             .ToArray();
+
+        // Removes the need to declare multitudes of [YamlObjectUnion ("!MyTag", typeof (MyImplementation))] on top of interfaces
+        // Makes an interface without [YamlObjectUnion] attributes discover its union members instead, finds every [YamlObject] type
+        // of this assembly implementing it. Without this, each implementation had to be listed on the interface by hand,
+        // and one left off it could neither be serialized through the interface nor deserialized from its tag. Such an
+        // interface used to be an error (AbstractMustUnion), so declarations that compiled before are unaffected.
+        // Explicit attributes still take precedence when present.
+        if (unions.Length == 0 && symbol.TypeKind == TypeKind.Interface)
+        {
+            unions = DiscoverUnions(symbol, references);
+        }
         var isUnion = unions.Length > 0;
 
         var diagnostics = new List<DiagnosticInfo>();
@@ -180,6 +191,53 @@ static class TypeMetaAnalyzer
             (false, true) => "struct",
             (false, false) => "class",
         };
+    }
+
+    // The union members of an interface declared without [YamlObjectUnion]: concrete, non-generic [YamlObject] classes
+    // and structs in the interface's assembly that implement it. Only namespace-level types are visited, since
+    // [YamlObject] isn't allowed on nested ones (NestedNotAllow).
+    //
+    // Each is tagged "!TypeName". Where several share a name, all of them take "!Namespace.TypeName" instead, so no tag
+    // depends on which of them was found first. Members are ordered most derived first: the generated serializer is a
+    // type switch, and a base class listed ahead of its subclass would also match the subclass and tag it as the base.
+    static UnionAnalysis[] DiscoverUnions(INamedTypeSymbol symbol, ReferenceSymbols references)
+    {
+        var found = new List<INamedTypeSymbol>();
+        var namespaces = new Stack<INamespaceSymbol>();
+        namespaces.Push(symbol.ContainingAssembly.GlobalNamespace);
+        while (namespaces.Count > 0)
+        {
+            var ns = namespaces.Pop();
+            foreach (var child in ns.GetNamespaceMembers())
+            {
+                namespaces.Push(child);
+            }
+
+            foreach (var type in ns.GetTypeMembers())
+            {
+                if (type.IsAbstract || type.IsGenericType || type.TypeKind is not (TypeKind.Class or TypeKind.Struct))
+                {
+                    continue;
+                }
+
+                if (type.AllInterfaces.Contains(symbol, SymbolEqualityComparer.Default) &&
+                    type.GetAttributes().Any(a => SymbolEqualityComparer.Default.Equals(a.AttributeClass, references.YamlObjectAttribute)))
+                {
+                    found.Add(type);
+                }
+            }
+        }
+
+        var collisions = new HashSet<string>(found.GroupBy(x => x.Name).Where(g => g.Count() > 1).Select(g => g.Key));
+        return found
+            .OrderByDescending(x => x.GetAllBaseTypes().Count())
+            .ThenBy(x => x.Name, StringComparer.Ordinal)
+            .Select(x => new UnionAnalysis(
+                collisions.Contains(x.Name) && !x.ContainingNamespace.IsGlobalNamespace
+                    ? $"!{x.ContainingNamespace.ToDisplayString()}.{x.Name}"
+                    : $"!{x.Name}",
+                x))
+            .ToArray();
     }
 
     static bool Validate(
